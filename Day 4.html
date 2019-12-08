@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+  </head>
+  <body>
+    <script>
+      let start = 359282;
+      let end = 820401;
+      let passwords = [];
+      for (let i = start; i <= end; i++) {
+        let str = String(i);
+        if (str[5] < str[4]) i = Number(str.slice(0, 5) + str[4]);
+        if (str[4] < str[3]) i = Number(str.slice(0, 4) + str[3].repeat(2));
+        if (str[3] < str[2]) i = Number(str.slice(0, 3) + str[2].repeat(3));
+        if (str[2] < str[1]) i = Number(str.slice(0, 2) + str[1].repeat(4));
+        if (str[1] < str[0]) i = Number(str.slice(0, 1) + str[0].repeat(5));
+        if (i > end) break;
+        if (!checkDouble(i)) continue;
+        passwords.push(i);
+      }
+      console.log(passwords.length);
+      checkedPasswords = passwords.filter(x => checkCount(x));
+      console.log(checkedPasswords.length);
+      function checkDouble(num) {
+        let str = String(num);
+        for (let i = 1; i < str.length; i++) {
+          if (str[i] == str[i - 1]) return true;
+        }
+        return false;
+      }
+      function checkCount(num) {
+        let str = String(num);
+        let count = {};
+        for (let i = 0; i < str.length; i++) {
+          if (count[str[i]] == undefined) count[str[i]] = 1;
+          else count[str[i]]++;
+        }
+        for (let value in count) {
+          if (count[value] == 2) return true;
+        }
+        return false;
+      }
+    </script>
+  </body>
+</html>
