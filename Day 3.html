@@ -14,48 +14,53 @@
       let crosses = findCross(wire1, wire2);
       let distance = findManhDistance(crosses);
       console.log(distance);
-      let steps = findFirstCross(wire1, wire2);
-      console.log(steps);
-      function createLine(direction, coords) {
-        let [x, y] = coords.split(",");
-        let line = [];
-        let length = direction.slice(1);
-        switch (direction[0]) {
-          case "R":
-            for (let i = 0; i < length; i++) {
-              line.push(`${++x},${y}`);
-            }
-            break;
-          case "U":
-            for (let i = 0; i < length; i++) {
-              line.push(`${x},${++y}`);
-            }
-            break;
-          case "L":
-            for (let i = 0; i < length; i++) {
-              line.push(`${--x},${y}`);
-            }
-            break;
-          case "D":
-            for (let i = 0; i < length; i++) {
-              line.push(`${x},${--y}`);
-            }
-            break;
-        }
-        return line;
-      }
+      let minSteps = findFirstCross(wire1, wire2);
+      console.log(minSteps);
       function createWire(data) {
         let dataArray = data.split(",");
-        let wire = ["0,0"];
-        for (let direction of dataArray) {
-          wire.push(...createLine(direction, wire[wire.length - 1]));
+        let wire = {};
+        let [x, y] = ["0", "0"];
+        let steps = 0;
+        for (let i = 0; i < dataArray.length; i++) {
+          let length = dataArray[i].slice(1);
+          switch (dataArray[i][0]) {
+            case "R":
+              for (let j = 0; j < length; j++) {
+                if (wire[++x] == undefined) wire[x] = [`${y},${++steps}`];
+                else wire[x].push(`${y},${++steps}`);
+              }
+              break;
+            case "U":
+              for (let j = 0; j < length; j++) {
+                if (wire[x] == undefined) wire[x] = [`${++y},${++steps}`];
+                else wire[x].push(`${++y},${++steps}`);
+              }
+              break;
+            case "L":
+              for (let j = 0; j < length; j++) {
+                if (wire[--x] == undefined) wire[x] = [`${y},${++steps}`];
+                else wire[x].push(`${y},${++steps}`);
+              }
+              break;
+            case "D":
+              for (let j = 0; j < length; j++) {
+                if (wire[x] == undefined) wire[x] = [`${++y},${++steps}`];
+                else wire[x].push(`${--y},${++steps}`);
+              }
+              break;
+          }
         }
         return wire;
       }
-      function findCross(arr, arr2) {
+      function findCross(wire1, wire2) {
         let crosses = [];
-        for (let i = 1; i < arr2.length; i++) {
-          if (arr.includes(arr2[i])) crosses.push(arr2[i]);
+        for (let x in wire2) {
+          if (wire1[x] == undefined) continue;
+          for (let i = 0; i < wire2[x].length; i++) {
+            let y = wire2[x][i].split(",")[0];
+            let index = wire1[x].findIndex(item => item.split(",")[0] == y);
+            if (index != -1) crosses.push(`${x},${y}`);
+          }
         }
         return crosses;
       }
@@ -65,12 +70,18 @@
         );
         return Math.min(...sum);
       }
-      function findFirstCross(arr, arr2) {
+      function findFirstCross(wire1, wire2) {
         let crosses = [];
-        for (let i = 1; i < arr2.length; i++) {
-          let index = arr.indexOf(arr2[i]);
-          if (index != -1) crosses.push(i + index);
-          if (i > Math.min(...crosses)) break;
+        for (let x in wire2) {
+          if (wire1[x] == undefined) continue;
+          for (let i = 0; i < wire2[x].length; i++) {
+            let y = wire2[x][i].split(",")[0];
+            let index = wire1[x].findIndex(item => item.split(",")[0] == y);
+            if (index != -1)
+              crosses.push(
+                +wire2[x][i].split(",")[1] + +wire1[x][index].split(",")[1]
+              );
+          }
         }
         return Math.min(...crosses);
       }
