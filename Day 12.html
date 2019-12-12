@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+  </head>
+  <body>
+    <script>
+      const data = `<x=16, y=-8, z=13>
+<x=4, y=10, z=10>
+<x=17, y=-5, z=6>
+<x=13, y=-3, z=0>`;
+      const dataArray = data.split("\n");
+      let moons = [];
+      let regexp = /-?\d+/g;
+      for (let i = 0; i < dataArray.length; i++) {
+        let moon = dataArray[i].match(regexp);
+        moon = moon.map(x => Number(x)).concat(0, 0, 0);
+        moons.push(moon);
+      }
+      let moons2 = timeSteps(moons, 1000);
+      console.log(moons2);
+      let total = countTotal(moons2);
+      console.log(total);
+      let periods = timeSteps(moons);
+      console.log(periods);
+      let repeatStep = getSmallestCommon(periods);
+      console.log(repeatStep);
+      function timeSteps(data, num = Infinity) {
+        let data2 = data.map(x => [...x]);
+        let periods = [];
+        let periods2 = [];
+        for (let k = 0; k < num; k++) {
+          for (let i = 0; i < data2.length; i++) {
+            let others = [].concat(data2.slice(0, i), data2.slice(i + 1));
+            for (let moon of others) {
+              if (moon[0] > data2[i][0]) data2[i][3]++;
+              if (moon[0] < data2[i][0]) data2[i][3]--;
+              if (moon[1] > data2[i][1]) data2[i][4]++;
+              if (moon[1] < data2[i][1]) data2[i][4]--;
+              if (moon[2] > data2[i][2]) data2[i][5]++;
+              if (moon[2] < data2[i][2]) data2[i][5]--;
+            }
+          }
+          for (let moon of data2) {
+            moon[0] += moon[3];
+            moon[1] += moon[4];
+            moon[2] += moon[5];
+          }
+          if (num == Infinity) {
+            if (
+              periods2[0] != undefined &&
+              periods2[1] != undefined &&
+              periods2[2] != undefined
+            )
+              return periods2;
+            if (periods2[0] == undefined)
+              if (data2[0][0] == data[0][0])
+                if (data2[1][0] == data[1][0])
+                  if (data2[1][0] == data[1][0])
+                    if (data2[1][0] == data[1][0]) {
+                      if (k == periods[0]) periods2[0] = k + 1;
+                      else periods[0] = k + 1;
+                    }
+            if (periods2[1] == undefined)
+              if (data2[0][1] == data[0][1])
+                if (data2[1][1] == data[1][1])
+                  if (data2[1][1] == data[1][1])
+                    if (data2[1][1] == data[1][1]) {
+                      if (k == periods[1]) periods2[1] = k + 1;
+                      else periods[1] = k + 1;
+                    }
+            if (periods2[2] == undefined)
+              if (data2[0][2] == data[0][2])
+                if (data2[1][2] == data[1][2])
+                  if (data2[1][2] == data[1][2])
+                    if (data2[1][2] == data[1][2]) {
+                      if (k == periods[2]) periods2[2] = k + 1;
+                      else periods[2] = k + 1;
+                    }
+          }
+        }
+        return data2;
+      }
+      function countTotal(data) {
+        return data
+          .map(moon => moon.map(x => Math.abs(x)))
+          .map(
+            moon =>
+              (moon[0] + moon[1] + moon[2]) * (moon[3] + moon[4] + moon[5])
+          )
+          .reduce((a, b) => a + b, 0);
+      }
+      function every(x, arr) {
+        let result = true;
+        for (let i = 0; i < arr.length; i++) {
+          if (arr[i] > Math.sqrt(x)) break;
+          if (!(x % arr[i])) {
+            result = false;
+            break;
+          }
+        }
+        return result;
+      }
+      function getPrimes(n) {
+        let primes = [2];
+        for (let i = 3; i <= n; i += 2) {
+          if (every(i, primes)) primes.push(i);
+        }
+        return primes;
+      }
+      function getMultipliers(n) {
+        let pr = getPrimes(n);
+        let multipliers = {};
+        if (pr.indexOf(n) >= 0) multipliers[n] = 1;
+        else {
+          for (let i = 0; i < pr.length; i++) {
+            if (n % pr[i] == 0) {
+              n /= pr[i];
+              if (multipliers[pr[i]] == undefined) multipliers[pr[i]] = 1;
+              else multipliers[pr[i]]++;
+              i--;
+            }
+          }
+        }
+        return multipliers;
+      }
+      function getSmallestCommon(arr) {
+        arr.sort((a, b) => a - b);
+        let obj = {};
+        for (let i = 0; i <= arr.length; i++) {
+          let t = getMultipliers(arr[i]);
+          for (let key in t) {
+            if (obj[key] == undefined || obj[key] < t[key]) {
+              obj[key] = t[key];
+            }
+          }
+        }
+        let result = 1;
+        for (let key in obj) {
+          result *= Math.pow(key, obj[key]);
+        }
+        return result;
+      }
+    </script>
+  </body>
+</html>
